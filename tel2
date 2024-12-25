@@ -1,0 +1,109 @@
+// Required Libraries: Express for Node.js
+// Run: Install Node.js and install dependencies using 'npm install express body-parser ejs'
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+
+// Middleware for parsing JSON and URL-encoded data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+
+// Sample Data (Replace with DB integration)
+let users = [
+  { id: 1, name: "Dr. Alice", role: "doctor" },
+  { id: 2, name: "John Doe", role: "patient" }
+];
+
+let appointments = [];
+
+// Routes
+app.get('/', (req, res) => {
+  res.render('index', { users });
+});
+
+app.post('/appointments', (req, res) => {
+  const { patient, doctor, date, time } = req.body;
+  appointments.push({ patient, doctor, date, time });
+  res.redirect('/appointments');
+});
+
+app.get('/appointments', (req, res) => {
+  res.render('appointments', { appointments });
+});
+
+// Start Server
+app.listen(port, () => {
+  console.log(`Telemedicine Prototype running at http://localhost:${port}`);
+});
+
+// EJS Templates (index.ejs and appointments.ejs)
+// Place these files in a 'views' folder
+
+/* index.ejs */
+/*
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telemedicine Prototype</title>
+</head>
+<body>
+  <h1>Welcome to Telemedicine Platform</h1>
+  <h2>Schedule an Appointment</h2>
+  <form action="/appointments" method="POST">
+    <label for="patient">Patient:</label>
+    <select name="patient" id="patient">
+      <% users.filter(user => user.role === 'patient').forEach(user => { %>
+        <option value="<%= user.name %>"><%= user.name %></option>
+      <% }) %>
+    </select>
+    <br />
+    <label for="doctor">Doctor:</label>
+    <select name="doctor" id="doctor">
+      <% users.filter(user => user.role === 'doctor').forEach(user => { %>
+        <option value="<%= user.name %>"><%= user.name %></option>
+      <% }) %>
+    </select>
+    <br />
+    <label for="date">Date:</label>
+    <input type="date" name="date" required />
+    <br />
+    <label for="time">Time:</label>
+    <input type="time" name="time" required />
+    <br />
+    <button type="submit">Schedule</button>
+  </form>
+</body>
+</html>
+*/
+
+/* appointments.ejs */
+/*
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments</title>
+</head>
+<body>
+  <h1>Scheduled Appointments</h1>
+  <ul>
+    <% appointments.forEach(appointment => { %>
+      <li>
+        <strong>Patient:</strong> <%= appointment.patient %> - 
+        <strong>Doctor:</strong> <%= appointment.doctor %> - 
+        <strong>Date:</strong> <%= appointment.date %> - 
+        <strong>Time:</strong> <%= appointment.time %>
+      </li>
+    <% }) %>
+  </ul>
+  <a href="/">Back</a>
+</body>
+</html>
+*/
